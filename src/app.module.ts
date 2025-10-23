@@ -1,31 +1,41 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserController } from './user/user.controller';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     ClientsModule.register([
       {
         name: "USER_SERVICE",
         transport: Transport.TCP,
         options: {
-          host: "127.0.0.1",
+          host: process.env.USER_SERVICE_HOST,
           port: 4000
         }
       },
       {
-        name: "ORDER_SERVICE",
+        name: "AUTH_SERVICE",
         transport: Transport.TCP,
         options: {
-          host: "127.0.0.1",
+          host: process.env.AUTH_SERVICE_HOTS,
           port: 5000
+        }
+      },
+      {
+        name: "PRODUCT_SERVICE",
+        transport: Transport.TCP,
+        options: {
+          host: process.env.PRODUCT_SERVICE_HOST,
+          port: 6000
         }
       }
     ])
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService],
+  controllers: [UserController],
+  providers: [],
 })
 export class AppModule {}
